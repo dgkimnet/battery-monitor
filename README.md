@@ -2,6 +2,10 @@
 
 Battery Monitor collects laptop battery health samples from Linux and macOS clients and stores them in a PostgreSQL-backed API.
 
+![BatteryMonitorDashboard-Grafana.png](BatteryMonitorDashboard-Grafana.png)
+
+**Grafana should be configured separately** (*only [json](./grafana/dashboards/battery-monitor-postgres.json) is provided*)
+
 ## What It Collects
 
 The client sends every supported metric it can discover:
