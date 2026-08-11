@@ -84,6 +84,16 @@ Configure these in this app repository:
 
 The event type is `image-published`. The payload includes the app name, source repo, ref, sha, image tags, and image digest.
 
+## Grafana
+
+An importable PostgreSQL dashboard template is available at:
+
+```text
+grafana/dashboards/battery-monitor-postgres.json
+```
+
+Import it in Grafana, then select the PostgreSQL datasource from the dashboard's `PostgreSQL datasource` dropdown. The dashboard includes filters for device, hostname, and battery name; each defaults to `All`.
+
 ## OpenTelemetry
 
 The API enables tracing when standard OpenTelemetry environment variables are present. The K3s GitOps deployment injects:
