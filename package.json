@@ -1,0 +1,27 @@
+{
+  "name": "battery-monitor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Battery health monitor API server",
+  "main": "server/src/index.js",
+  "scripts": {
+    "start": "node server/src/index.js",
+    "dev": "node --watch server/src/index.js",
+    "db:migrate": "prisma migrate deploy",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio",
+    "lint": "node --check server/src/*.js server/src/middleware/*.js server/src/routes/*.js server/src/utils/*.js"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.9.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "prisma": "^7.9.1"
+  }
+}

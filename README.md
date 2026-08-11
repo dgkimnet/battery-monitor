@@ -1,0 +1,85 @@
+# Battery Monitor
+
+Battery Monitor collects laptop battery health samples from Linux and macOS clients and stores them in a PostgreSQL-backed API.
+
+## What It Collects
+
+The client sends every supported metric it can discover:
+
+- Battery state of charge
+- Designed capacity
+- Current full capacity
+- Charging or discharging current
+- Cycle count
+- Voltage, temperature, power, health percentage, battery status, and other available values
+
+## Local Server
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+The API listens on `http://localhost:3000`.
+Prisma Studio listens on `http://localhost:5555`.
+
+Useful endpoints:
+
+- `GET /healthz`
+- `POST /api/v1/samples`
+- `GET /api/v1/devices/:deviceId/samples`
+
+Database access uses Prisma ORM. Migrations live in `prisma/migrations`, and the schema is defined in `prisma/schema.prisma`.
+
+```bash
+npm run db:generate
+npm run db:migrate
+```
+
+`docker compose` uses local `.env` through `env_file` for development. Keep `.env` scoped to local runtime values only. GitHub Actions values such as `GITOPS_REPOSITORY` belong in GitHub repository settings, not local `.env`.
+
+Prisma Client generation does not connect to PostgreSQL. Prisma 7 still requires `DATABASE_URL` to be present while loading `prisma.config.js`, so the Docker build uses a build-only placeholder URL for `prisma generate`. Runtime commands such as `prisma migrate deploy`, the API server, and Prisma Studio use the real `DATABASE_URL` injected by Compose locally or by K3s in the cluster.
+
+## Client
+
+The client is a Python 3 script using only the standard library.
+
+```bash
+cp client/.env.example client/.env
+BATTERY_MONITOR_API_URL=http://localhost:3000 \
+BATTERY_MONITOR_DEVICE_ID="$(hostname)" \
+python3 client/battery_collector.py
+```
+
+Install cron:
+
+```bash
+BATTERY_MONITOR_API_URL=https://battery-api.example.com \
+BATTERY_MONITOR_DEVICE_ID="$(hostname)" \
+BATTERY_MONITOR_API_TOKEN=change-me \
+./client/install_cron.sh
+```
+
+## Container Image
+
+GitHub Actions builds and pushes:
+
+```text
+ghcr.io/<owner>/<repo>:<branch-or-tag>
+ghcr.io/<owner>/<repo>:<sha>
+```
+
+Set `BATTERY_MONITOR_API_TOKEN` as a repository secret if you want the deployment manifest to require clients to send a bearer token.
+
+## GitOps Dispatch
+
+This repository does not store K3s, ArgoCD, or deployment manifests. The private GitOps repository owns those files.
+
+After GitHub Actions builds and pushes the container image, it can trigger the private GitOps repository with `repository_dispatch`.
+
+Configure these in this app repository:
+
+- GitHub Settings > Secrets and variables > Actions > Variables: `GITOPS_REPOSITORY`, in `owner/repo` form
+- GitHub Settings > Secrets and variables > Actions > Secrets: `GITOPS_REPO_TOKEN`, with access to dispatch to the target repo
+
+The event type is `image-published`. The payload includes the app name, source repo, ref, sha, image tags, and image digest.
