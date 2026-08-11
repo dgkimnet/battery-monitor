@@ -37,6 +37,13 @@ def run_command(args):
         return ""
 
 
+def first_existing_path(paths):
+    for path in paths:
+        if Path(path).exists():
+            return path
+    return paths[0]
+
+
 def linux_sample():
     power_supply = Path("/sys/class/power_supply")
     batteries = sorted(path for path in power_supply.glob("BAT*") if path.is_dir())
@@ -89,7 +96,8 @@ def linux_sample():
 
 
 def macos_sample():
-    output = run_command(["ioreg", "-rn", "AppleSmartBattery"])
+    ioreg = first_existing_path(("/usr/sbin/ioreg", "/usr/bin/ioreg", "ioreg"))
+    output = run_command([ioreg, "-rn", "AppleSmartBattery"])
     if not output:
         return None
 
