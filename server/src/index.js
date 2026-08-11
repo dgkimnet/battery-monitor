@@ -1,5 +1,9 @@
 require("dotenv").config();
 
+const { shutdownTelemetry, startTelemetry } = require("./telemetry");
+
+startTelemetry();
+
 const { prisma, close } = require("./db");
 const { createApp } = require("./app");
 
@@ -14,6 +18,7 @@ const server = app.listen(port, () => {
 async function shutdown() {
   server.close(async () => {
     await close();
+    await shutdownTelemetry();
     process.exit(0);
   });
 }

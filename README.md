@@ -83,3 +83,16 @@ Configure these in this app repository:
 - GitHub Settings > Secrets and variables > Actions > Secrets: `GITOPS_REPO_TOKEN`, with access to dispatch to the target repo
 
 The event type is `image-published`. The payload includes the app name, source repo, ref, sha, image tags, and image digest.
+
+## OpenTelemetry
+
+The API enables tracing when standard OpenTelemetry environment variables are present. The K3s GitOps deployment injects:
+
+```text
+OTEL_SERVICE_NAME=battery-monitor
+OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector.observability:4318
+OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+OTEL_RESOURCE_ATTRIBUTES=deployment.environment=prod,k8s.namespace.name=battery-monitor
+```
+
+HTTP, Express, PostgreSQL, and Prisma spans are instrumented. `/healthz` probe traffic is ignored.
