@@ -64,6 +64,18 @@ BATTERY_MONITOR_API_TOKEN=change-me \
 ./client/install_cron.sh
 ```
 
+Bluetooth keyboard battery SoC can be sent with the separate keyboard client:
+
+```bash
+BATTERY_MONITOR_API_URL=https://battery-api.example.com \
+BATTERY_MONITOR_API_TOKEN=change-me \
+BATTERY_MONITOR_DRY_RUN=1 \
+python3 client/bluetooth_keyboard/bluetooth_keyboard_collector.py
+```
+
+Set `BATTERY_MONITOR_KEYBOARD_NAME` to filter a specific keyboard name. Set `BATTERY_MONITOR_KEYBOARD_DEVICE_ID` only if you want to override the default keyboard-specific device id. Install its cron entry with `./client/bluetooth_keyboard/install_cron.sh`.
+On Linux, the keyboard client tries `/sys/class/power_supply`, `upower`, and `bluetoothctl` because Bluetooth HID battery reporting depends on the device and BlueZ/kernel support.
+
 ## Container Image
 
 GitHub Actions builds and pushes:
